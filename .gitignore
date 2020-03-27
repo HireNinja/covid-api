@@ -1,5 +1,7 @@
 /vendor
 /.idea
+/resources/json/timeseries.json
+.DS_Store
 Homestead.json
 Homestead.yaml
 .env
