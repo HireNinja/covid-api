@@ -15,6 +15,8 @@ $router->get('/', function () use ($router) {
     return "Welcome to Covid-19 API";
 });
 
+$router->get('/test', 'TestingController@test');
+
 resource($router, "case", 'API\CaseController');
 resource($router, "place", 'API\PlaceController');
 resource($router, "post", 'API\PostController');
