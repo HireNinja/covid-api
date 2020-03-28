@@ -99,7 +99,6 @@ class APIController extends Controller
         }
         $model = $this->model->first();
 
-        $this->authorize('show', $model);
         if (empty($model->uuid)) {
             app()->abort(404, "Resource does not exist");
         }
@@ -113,7 +112,6 @@ class APIController extends Controller
     */
     public function store(Request $request)
     {
-        $this->authorize('store', $this->model);
         $record = $this->model->create($request->except($this->filter_input));
         if (!$record->uuid) {
             app()->abort(500, "The operation requested couldn't be completed");

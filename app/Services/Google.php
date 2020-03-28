@@ -25,9 +25,9 @@ class Google
         }else {
             abort(500, "Couldn't get to the geocoding results");
         }
-
         if (array_key_exists('geometry', $data)) {
-            return $data['geometry']['location'];
+            $location =  $data['geometry']['location'];
+            return [$location['lat'], $location['lng']];
         }
         return false;
     }
