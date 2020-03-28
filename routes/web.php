@@ -16,6 +16,7 @@ $router->get('/', function () use ($router) {
 });
 
 $router->get('/test', 'TestingController@test');
+$router->get('/home', 'HomeController@index');
 
 resource($router, "case", 'API\CaseController');
 resource($router, "place", 'API\PlaceController');
