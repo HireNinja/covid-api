@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Cases;
-use App\Services\Google;
+use App\Models\Location;
 
 class SyncCases extends Command
 {
@@ -28,77 +28,78 @@ class SyncCases extends Command
         }
         $data = $time_series[$country];
         $last = ['confirmed' => 0,'deaths' => 0,'recovered' => 0];
-        //$position = Google::GetPosition($country);
+        $location = Location::GetLocationByAddress($country);
 
         foreach ($data as $entry) {
-            $this->handleConfirmed($entry, $last, $country);
+            $this->handleConfirmed($entry, $last, $location);
             $last = $entry;
         }
         $last = ['confirmed' => 0,'deaths' => 0,'recovered' => 0];
         foreach ($data as $entry) {
-            $this->handleDeaths($entry, $last, $country);
+            $this->handleDeaths($entry, $last, $location);
             $last = $entry;
         }
 
         $last = ['confirmed' => 0,'deaths' => 0,'recovered' => 0];
         foreach ($data as $entry) {
-            $this->handleRecovered($entry, $last, $country);
+            $this->handleRecovered($entry, $last, $location);
             $last = $entry;
         }
     }
 
-    public function handleConfirmed($entry, $last, $country) {
+    public function handleConfirmed($entry, $last, $location) {
         $new_cases = $entry['confirmed'] - $last['confirmed'];
        
-        
         // New Cases per day
         if ($new_cases > 0) {
             Cases::Generate(
                 $new_cases, 
+                $location->uuid,
                 [
                     'is_confirmed' => true, 
                     'confirmed_at' => $entry['date'],
-                    'country' => $country,
-                    'position' => '(11,22)'
+                    'location_uuid' => $location->uuid
                 ]
             );
             $this->info($entry['date'] . ' : ' . $new_cases);
         }
     }
 
-    public function handleDeaths($entry, $last, $country) {
+    public function handleDeaths($entry, $last, $location) {
         $new_deaths = $entry['deaths'] - $last['deaths'];
 
         // New Deaths per day
         if ($new_deaths > 0) {
             Cases::UpdateDeaths(
                 $new_deaths,
+                $location->uuid,
                 [
                     'is_dead' => true,
                     'died_at' => $entry['date'],
-                    'country' => $country
+                    'location_uuid' => $location->uuid
                 ],
                 [
-                    ['country',$country]
+                    ['location_uuid',$location->uuid]
                 ]
             );
         }
     }
 
-    public function handleRecovered($entry, $last, $country) {
+    public function handleRecovered($entry, $last, $location) {
         $new_recovered = $entry['recovered'] - $last['recovered'];
 
         // New Deaths per day
         if ($new_recovered > 0) {
             Cases::UpdateRecovered(
                 $new_recovered,
+                $location->uuid,
                 [
                     'is_recovered' => true,
                     'recovered_at' => $entry['date'],
-                    'country' => $country
+                    'location_uuid' => $location->uuid
                 ],
                 [
-                    ['country',$country]
+                    ['location_uuid',$location->uuid]
                 ]
             );
             $this->info("Recovered, $new_recovered");

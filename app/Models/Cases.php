@@ -7,38 +7,21 @@ class Cases extends Model
 {
     protected $table = 'cases';
 
-    public function setPositionattribute($value) {
-        $this->attributes['position'] = '(' . implode(',', $value) . ')';
-    }
-
-    public static function Generate($num, $data = []) {
-        $count = Cases::whereCountry($data['country'])->whereIsConfirmed(true)->whereConfirmedAt($data['confirmed_at'])->count();
+    public static function Generate($num, $location_uuid, $data = []) {
+        $count = Cases::whereLocationUuid($location_uuid)->whereIsConfirmed(true)->whereConfirmedAt($data['confirmed_at'])->count();
         if ($num > $count) {
             $num = $num - $count;
         } elseif ($num == $count) {
             return;
         }
-        $full_address = '';
-        if (array_key_exists('address', $data)) {
-            $full_address = $data['adress'];
-        }
-         if (array_key_exists('city', $data)) {
-            $full_address .= $data['city'] . ', ';
-        }
-        $full_address .= $data['country'];
-        $position = Google::GetPosition($full_address);        
-        $data = array_merge($data,[
-            'position' => $position
-        ]);
-
         for($i=0; $i<$num; $i++){
             self::create($data);
         }
     }
 
-    public static function UpdateDeaths($num, $data = [], $where ){
+    public static function UpdateDeaths($num, $location_uuid, $data = [], $where ){
         $died_at = $data['died_at'];
-        $count = Cases::where($where)->whereIsDead(true)->whereDiedAt($data['died_at'])->count();
+        $count = Cases::whereLocationUuid($location_uuid)->whereIsDead(true)->whereDiedAt($data['died_at'])->count();
 
         if ($num > $count) {
             $num = $num - $count;
@@ -60,9 +43,9 @@ class Cases extends Model
         return;
     }
 
-    public static function UpdateRecovered($num, $data = [], $where ){
+    public static function UpdateRecovered($num,$location_uuid, $data = [], $where ){
         $recovered_at = $data['recovered_at'];
-        $count = Cases::where($where)->whereIsRecovered(true)->whereRecoveredAt($recovered_at)->count();
+        $count = Cases::whereLocationUuid($location_uuid)->whereIsRecovered(true)->whereRecoveredAt($recovered_at)->count();
 
         if ($num > $count) {
             $num = $num - $count;
@@ -86,5 +69,5 @@ class Cases extends Model
 }
 
 Cases::creating(function($case) {
-    $case->sku = $case->country . "-" . "NA" . "-" . uniqid();
+    $case->sku = uniqid();
 });

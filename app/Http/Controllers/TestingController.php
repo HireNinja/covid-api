@@ -11,12 +11,13 @@ class TestingController extends Controller
 {
     public function __construct()
     {
+        
     }
 
     public function test(Request $request)
     {
-        $place = Location::GetLocationByAddress("Islamabad, Pakistan");
+        $location = Location::GetLocationByAddress("Islamabad, Pakistan");
 
-        return $place;
+        return $location;
     }
 }
