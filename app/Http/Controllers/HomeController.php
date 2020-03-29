@@ -10,6 +10,7 @@ use App\Models\Tracker;
 class HomeController extends Controller
 {
     public function __construct() {
+
     }
 
     public function index(Request $request) {
@@ -17,13 +18,14 @@ class HomeController extends Controller
         if ($request->has('location')) {
             $address = $request->location;
         }
-
         $location = Location::GetLocationByAddress($address);
-    
-
         
+        $response = [
+            'tracker' => Tracker::GetLocationStats($location),
+            'cases' => Cases::GetAllByLocation($location)
+        ];
 
-        return $location;
+        return $response;
     }
 
 }

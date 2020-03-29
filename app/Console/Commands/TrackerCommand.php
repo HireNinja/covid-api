@@ -21,7 +21,10 @@ class TrackerCommand extends Command
         $this->trackDailyDeaths($loc_uuids);
         $this->trackDailyRecovered($loc_uuids);
         Tracker::TrackTotal(date("Y-m-d"), $this->location->uuid);
-        $this->fixTotalFromInterval();        
+        $this->fixTotalFromInterval();
+
+        $this->location->last_tracked_at = \DB::raw('now()');
+        $this->location->save();
     }
 
     public function fixTotalFromInterval() {

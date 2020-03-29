@@ -15,8 +15,9 @@ class TestingController extends Controller
     }
 
     public function test(Request $request)
-    {
-        $location = Cases::GetTotalConfirmed(['ce1f4505-057e-4cd5-9abe-1da3ed59b96b']);
+    {   
+
+        $location = Location::GetLocationByAddress("F10, Islamabad, Pakistan");
 
         return $location;
     }

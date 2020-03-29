@@ -4,6 +4,7 @@ namespace App\Models;
 class Tracker extends Model
 {
     protected $table = 'tracker';
+    protected $hidden = ['deleted_at','created_at','updated_at','uuid'];
 
     public static function Track($data, $location_uuid) {
         $track = self::getTrackerEntry($data['entry_date'], $location_uuid);
@@ -21,7 +22,6 @@ class Tracker extends Model
     }
 
     private static function getTrackerEntry($entry_date, $location_uuid) {
-        
         $track = Tracker::whereLocationUuid($location_uuid)->whereEntryDate($entry_date)->first();
         if ($track) {
             return $track;
@@ -29,9 +29,20 @@ class Tracker extends Model
         return Tracker::create(['entry_date'=>$entry_date, 'location_uuid' => $location_uuid]);
     }
 
-    public static function GetLocationStats($location_uuid) {
-        $data = Tracker::whereLocationUuid($location_uuid)->orderBy('entry_date', 'desc')->limit(2);
+    public static function GetLocationStats($location) {
+        $data = Tracker::whereLocationUuid($location->uuid)->orderBy('entry_date', 'desc')->limit(2)->get();
+        if (count($data) < 2) {
+            abort(404, "Sorry, we don't have enough data at a moment");
+        }
+        $today = $data[0];
+        $yesterday = $data[1];
 
-        return $data;
+        $today['new_confirmed_growth'] = $yesterday['total_confirmed'] > 0 ? \ceil($today['new_confirmed'] / $yesterday['total_confirmed'] * 100) : '-' ; 
+        $today['new_deaths_growth'] = $yesterday['total_deaths'] > 0 ? \ceil($today['new_deaths'] / $yesterday['total_deaths'] * 100) : '-' ;
+        $today['new_recovered_growth'] = $yesterday['total_recovered'] > 0 ? \ceil($today['new_recovered'] / $yesterday['total_recovered'] * 100) : '-' ;
+
+        $today['location'] = $location;
+
+        return $today;
     }
 }

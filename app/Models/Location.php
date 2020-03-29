@@ -5,10 +5,30 @@ use App\Helpers\DBArray;
 class Location extends Model
 {
     protected $table = 'locations';
+    protected $hidden = ['deleted_at','updated_at','created_at','parent_uuid','last_tracked_at','bounds'];
 
-    public function setPositionattribute($value) {
+    public function applySearchQuery($query, $value){
+        $query = $query->where("long_name","ilike", "%" . $value . "%");
+        return $query;
+    }
+    
+    public function setPositionAttribute($value) {
         $this->attributes['position'] = '(' . implode(',', $value) . ')';
     }
+    public function getPositionAttribute($value) {
+        $point = DBArray::toPoint($value);
+        $point = \explode(",",$point);
+        return [
+            \floatval($point[0]),
+            \floatval($point[1])
+        ];
+    }
+
+    public function getViewportAttribute($value) {
+        return json_decode($value,true);
+    }
+
+
     public function setParentsAttribute($value) {
         $this->attributes['parents'] = DBArray::toString($value);
     }
@@ -22,7 +42,7 @@ class Location extends Model
         $parent_uuids = [];
 
         foreach ($place['parents'] as $parent) {
-            $parent_location = Location::whereShortName($parent['long_name'])->first(); 
+            $parent_location = Location::whereShortName($parent['short_name'])->first(); 
             if (!$parent_location) {
                 $parent_place = Google::getPlace($parent['long_name']);
                 unset($parent_place['parents']);
@@ -40,7 +60,7 @@ class Location extends Model
         if ($parent_uuid) {
             $place['parent_uuid'] = $parent_uuid;
         }
-        $place['parents'] = $parents_uuid;
+        $place['parents'] = $parent_uuids;
         return Location::create($place);
     }
 

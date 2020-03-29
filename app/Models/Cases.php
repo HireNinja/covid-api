@@ -3,9 +3,18 @@ namespace App\Models;
 
 use App\Services\Google;
 use App\Helpers\DBArray;
+use App\Models\Location;
+
 class Cases extends Model
 {
     protected $table = 'cases';
+
+    public static function GetAllByLocation($location) {
+        $children = Location::GetChildrenUuids($location->uuid); 
+
+        return $children;
+    }
+
 
     public static function Generate($num, $location_uuid, $data = []) {
         $count = Cases::whereLocationUuid($location_uuid)->whereIsConfirmed(true)->whereConfirmedAt($data['confirmed_at'])->count();

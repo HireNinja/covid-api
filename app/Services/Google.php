@@ -17,6 +17,8 @@ class Google
             'place_id' => $data['place_id'],
             'formatted_address' => $data['formatted_address'], 
             'position' => [$data['geometry']['location']['lat'],$data['geometry']['location']['lat']],
+            'viewport' => json_encode($data['geometry']['viewport']),
+            'bounds' => json_encode($data['geometry']['bounds']),
             'parents' => []
         ];
 
