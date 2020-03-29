@@ -43,6 +43,23 @@ class Cases extends Model
         return;
     }
 
+    public static function GetDailyDeaths($location_ids) {
+        return self::GetDailyCount("is_dead","died_at","new_deaths",$location_ids);
+    }
+    public static function GetDailyConfirmed($location_ids) {
+        return self::GetDailyCount("is_confirmed","confirmed_at","new_confirmed",$location_ids);
+    }
+    public static function GetDailyRecovered($location_ids) {
+        return self::GetDailyCount("is_recovered","recovered_at","new_recovered",$location_ids);
+    }
+
+    public static function GetDailyCount($field, $group_by, $name, $location_ids) {
+        $data = Cases::where($field, true)->whereIn("location_uuid",$location_ids)->orderBy($group_by)->groupBy($group_by)
+            ->select(\DB::raw("count(*) as $name"), \DB::raw("$group_by::date as entry_date"))->get();
+
+        return $data;
+    }
+
     public static function UpdateRecovered($num,$location_uuid, $data = [], $where ){
         $recovered_at = $data['recovered_at'];
         $count = Cases::whereLocationUuid($location_uuid)->whereIsRecovered(true)->whereRecoveredAt($recovered_at)->count();

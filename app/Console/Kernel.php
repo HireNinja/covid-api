@@ -13,7 +13,9 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\SyncCases::class,
+        Commands\SyncCases::class, // Runs every 15 mins
+        Commands\TrackerCommand::class, // Runs Contineously 
+        Commands\RetroactiveTracker::class // Runs Daily
     ];
 
     /**

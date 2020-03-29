@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4be8fced66fbffeff2568a82e343bfc0",
+    "content-hash": "c0d0e6d34b318f7b3ae476708f9ecda4",
     "packages": [
         {
             "name": "brick/math",
@@ -2222,6 +2222,54 @@
                 "uuid"
             ],
             "time": "2020-03-22T02:34:13+00:00"
+        },
+        {
+            "name": "staudenmeir/laravel-cte",
+            "version": "v1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/staudenmeir/laravel-cte.git",
+                "reference": "08e318b98e3f46c88a9cb5e947ece4bd8216029b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/staudenmeir/laravel-cte/zipball/08e318b98e3f46c88a9cb5e947ece4bd8216029b",
+                "reference": "08e318b98e3f46c88a9cb5e947ece4bd8216029b",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^7.0",
+                "php": "^7.2.5"
+            },
+            "require-dev": {
+                "laravel/homestead": "^10.0",
+                "orchestra/testbench": "^5.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Staudenmeir\\LaravelCte\\DatabaseServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Staudenmeir\\LaravelCte\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jonas Staudenmeir",
+                    "email": "mail@jonas-staudenmeir.de"
+                }
+            ],
+            "description": "Laravel queries with common table expressions",
+            "time": "2020-01-31T12:48:30+00:00"
         },
         {
             "name": "symfony/console",

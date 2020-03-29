@@ -43,4 +43,46 @@ class Location extends Model
         }
         return $location;
     }
+
+
+    public static function GetChildren($loc_uuid) {
+        $builder = new \Staudenmeir\LaravelCte\Query\Builder(app('db')->connection());
+        $q = app('db')->table('locations')
+                ->where(function($q) use ($loc_uuid) {
+                        $q->where('uuid', '=', $loc_uuid);
+                    })
+                ->selectRaw('uuid, short_name, parent_uuid, parents, position, 1 as level, array[uuid::varchar] as path_info, updated_at, created_at')
+                ->unionAll(
+                    app('db')->table('locations as c')
+                        ->selectRaw('c.uuid, c.short_name, c.parent_uuid, c.parents, c.position, p.level + 1, p.path_info||c.uuid::varchar, c.updated_at, c.created_at')
+                        ->join('location_tree as p', 'p.uuid', '=', 'c.parent_uuid')
+                );
+
+        $results = $builder
+                        ->from('location_tree')
+                        ->withRecursiveExpression('location_tree', $q)
+                        ->whereNotExists(function($q) {
+                            $q
+                            ->select(app('db')->raw(1))
+                            ->from('location_tree as t')
+                            ->whereRaw('t.uuid = location_tree.uuid')
+                            ->whereRaw('t.level > location_tree.level');
+                        })
+                        ->orderBy('level', 'desc')
+                        ->get();
+        $results = $results->map(function($result) {
+            return json_decode(json_encode($result), TRUE);
+        });
+        return $results;
+    }
+
+    public static function GetChildrenUuids($loc_uuid) {
+        $children = self::GetChildren($loc_uuid);
+        $uuids = [];
+        foreach ($children as $child) {
+            $uuids[] = $child['uuid'];
+        }
+        return $uuids;
+    }
+
 }
