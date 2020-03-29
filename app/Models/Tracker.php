@@ -28,4 +28,10 @@ class Tracker extends Model
         }
         return Tracker::create(['entry_date'=>$entry_date, 'location_uuid' => $location_uuid]);
     }
+
+    public static function GetLocationStats($location_uuid) {
+        $data = Tracker::whereLocationUuid($location_uuid)->orderBy('entry_date', 'desc')->limit(2);
+
+        return $data;
+    }
 }
